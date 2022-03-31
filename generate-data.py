@@ -1,14 +1,17 @@
-# THIS IS TRIGGER BY A CRON TIMMER BY FOLLOWING EXPRESSION
-# m h  dom mon dow   command
-# * * * * * /usr/bin/python3 /home/jcpleitez/CronScript/generate-data.py
+# Time
+from datetime import datetime
+from pytz import timezone
 
-import datetime
+# Zona horario de El Salvador
+tz = timezone('America/El_Salvador')
+dt = datetime.now(tz)
 
-datetime_object = datetime.datetime.now()
+# Truncado la fecha de inicio y fin primeros 10 minutos de cada hora
+fechaInicio = dt.replace(minute=0, second=0, microsecond=0)
+fechaFin = dt.replace(minute=10, second=0, microsecond=0)
 
-# Open a file with access mode 'a'
-file_object = open('/home/jcpleitez/CronScript/sample.txt', 'a')
-# Append 'hello' at the end of file
-file_object.write('hello using cron at ' + str(datetime_object) + '\n')
-# Close the file
-file_object.close()
+print("fechaInicio", fechaInicio.strftime('%Y-%m-%d_%H-%M-%S'))
+print("fechaFin", fechaFin.strftime('%Y-%m-%d_%H-%M-%S'))
+
+# Postgres
+import psycopg2
