@@ -1,5 +1,8 @@
 FROM python:3
 
+# Agregando Zona Horario
+ENV TZ="America/El_Salvador"
+
 WORKDIR /usr/src/app
 
 COPY requirements.txt ./

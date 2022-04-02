@@ -1,17 +1,13 @@
-# Time
-from datetime import datetime
-from pytz import timezone
+import common.script as com
+import postgres.script as pos
 
-# Zona horario de El Salvador
-tz = timezone('America/El_Salvador')
-dt = datetime.now(tz)
+# Initial Configuration for Postgres
+pos.iniConfigs("environment.ini")
+pos.test()
 
-# Truncado la fecha de inicio y fin primeros 10 minutos de cada hora
-fechaInicio = dt.replace(minute=0, second=0, microsecond=0)
-fechaFin = dt.replace(minute=10, second=0, microsecond=0)
-
+# Dates
+fechaInicio = com.getFechaInicio()
+fechaFin = com.getFechaFin()
 print("fechaInicio", fechaInicio.strftime('%Y-%m-%d_%H-%M-%S'))
 print("fechaFin", fechaFin.strftime('%Y-%m-%d_%H-%M-%S'))
 
-# Postgres
-import psycopg2

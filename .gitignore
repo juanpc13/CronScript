@@ -1,1 +1,3 @@
 status.log
+environment.ini
+*__pycache__
