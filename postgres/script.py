@@ -41,6 +41,29 @@ def runQuery(query):
   # Prueba de conexion
   cur = getCursor()
   cur.execute(query)
+  cur.close()
+
+def runQueryResult(query):
+  # Prueba de conexion
+  cur = getCursor()
+  cur.execute(query)
   result = cur.fetchone()
   cur.close()
   return result
+
+# Queue multiData
+curQueue = None
+def startQueue():
+  # iniciar un cursor
+  global curQueue
+  curQueue = getCursor()
+def addQueue(query):
+  # Agregar a la cola
+  global curQueue
+  curQueue.execute(query)
+def endQueue():
+  # Enviar todo y cerrar cursor
+  global curQueue
+  conn.commit()
+  curQueue.close()
+  curQueue = None
