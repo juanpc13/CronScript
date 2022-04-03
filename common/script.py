@@ -8,3 +8,8 @@ def getFechaInicio():
     return fechaInicio
 def getFechaFin():
     return fechaFin
+def getCurrentMinute():
+    return dt.replace(second=0, microsecond=0)
+
+# PRINT FOR LOGS
+print("LOG----------" + dt.strftime('%Y-%m-%d %H:%M:%S') + "----------")
