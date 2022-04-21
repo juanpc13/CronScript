@@ -1,52 +1,48 @@
 import common.script as com
 import postgres.script as pos
+import mathematics.script as mat
 
 # Initial Configuration for Postgres
 pos.iniConfigs("environment.ini")#pos.test()
 
-# Generalidades
-idInvestigacion = 1
-idDispositivo = 1
-fechaInicio = com.getFechaInicio().strftime('%Y-%m-%d %H:%M:%S')
-fechaFin = com.getFechaFin().strftime('%Y-%m-%d %H:%M:%S')
-print("fechaInicio\t", fechaInicio, "\nfechaFin\t", fechaFin)
+# Generalidades Globales
+fecha_inicio = com.getFechaInicio().strftime('%Y-%m-%d %H:%M:%S')
+fecha_fin = com.getFechaFin().strftime('%Y-%m-%d %H:%M:%S')
 
+# Rutuna contiene todas las DATA A GENERAR, POR CADA UNO OBTEBER SU MEJOR PENDIENTE Y GUARDARLA EN LA BD
+query = pos.getQueryRutinas()
+rutinas = pos.queryFetchAll(query)
 
-# OBTENER LOS DATOS Y PROCESARLOS 
-# columna 1 nombre de la grafica a generar (H2S-SO2)(H2-SO2)(CO2-SO2)(CO2-H2S)(H2O-SO2)
-# columna 2 numero de columna de variable 1
-# columna 3 numero de columna de variable 2
-relacionGraficos = [
-    ["CO2-H2O", 15, 14],
-    ["H2S-SO2", 17, 18],
-    ["H2-SO2",  16, 17],
-    ["CO2-SO2", 15, 17],
-    ["CO2-H2S", 15, 17],
-    ["H2O-SO2", 14, 17]
-]
-
-for datosGrafico in range(relacionGraficos):
+for rutina in range(rutinas):
+    ########GENERALIDADES DE LA RUTINA A GENERAR########
+    # Id Rutina
+    id_rutina = rutina[0]
+    # Id Investigacion
+    id_investigacion = rutina[1]
+    # Id Dispositivo
+    id_dispositivo = rutina[2]
     # Se setea el nombre del grafico
-    nombreGrafico = datosGrafico[0]
+    nombre = rutina[3]
+
+    # Se genera la QUERY para obtener la maindata a procesar
+    query = pos.getQueryMainData(id_investigacion, id_dispositivo, fecha_inicio, fecha_fin)
+    maindata = pos.queryFetchAll(query)
+
     # EJE X data que corresponde a la columna
-    ejeX = maindata(datosGrafico[1])
+    index = rutina[4]
+    ejeX = maindata(index)
     # EJE Y data que corresponde a la columna
-    ejeY = maindata(datosGrafico[2])
+    index = rutina[5]
+    ejeY = maindata(index)
+
+    # FALTA IMPLEMENTAR LOS MULTIPLICADORES
     
+    # Se calcula todo lo necesario para la regresion
+    pendiente, intercepto, coeficiente_correlacion, p, stderr = mat.regresionLineal(ejeX, ejeY)
+    descripcion = f'Regresion Lineal: Y = {intercepto:.3f} + {pendiente:.3f}X, R={r:.3f}'
 
     # Creacion de la Query por cada uno de los graficos
-    query = "INSERT INTO historico(id_investigacion, id_dispositivo, fecha_inicio, fecha_fin, nombre, pendiente, constante, coeficiente_correlacion, descripcion) "
-    query += "VALUES ({}, {}, '{}', '{}', {}, {}, {}, {}, {})".format(
-        idInvestigacion,
-        idDispositivo,
-        fechaInicio.strftime('%Y-%m-%d %H:%M:%S'),
-        fechaFin.strftime('%Y-%m-%d %H:%M:%S'),
-        nombreGrafico,
-        pendiente,
-        constante,
-        coeficiente_correlacion,
-        descripcion
-    )
-    # Enviar la data y guardarla en logs
+    constante = intercepto
+    query = getQueryHistorico(id_rutina, nombre, fecha_inicio, fecha_fin, pendiente, constante, coeficiente_correlacion, descripcion)
     pos.runQuery(query)
     print(query)
