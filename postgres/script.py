@@ -19,6 +19,7 @@ def getConnection():
   global conn, configs
   if conn == None:
     conn = psycopg2.connect(**configs)
+    conn.autocommit = True
   return conn
 
 def getCursor():
@@ -88,14 +89,19 @@ def getQueryMainData(idInvestigacion, idDispositivo, fechaInicio, fechaFin):
 
 def getQueryHistorico(id_rutina, nombre, fecha_inicio, fecha_fin, pendiente, constante, coeficiente_correlacion, descripcion):
   query = "INSERT INTO historico(id_rutina, nombre, fecha_inicio, fecha_fin, pendiente, constante, coeficiente_correlacion, descripcion) "
-  query += "VALUES ({}, {}, '{}', '{}', {}, {}, {}, {})".format(
+  query += "VALUES ({}, '{}', '{}', '{}', {}, {}, {}, '{}')".format(
     id_rutina,
     nombre,
-    fecha_inicio.strftime('%Y-%m-%d %H:%M:%S'),
-    fecha_fin.strftime('%Y-%m-%d %H:%M:%S'),
+    fecha_inicio,
+    fecha_fin,
     pendiente,
     constante,#LO MISMO QUE CONSTANTE o intercepto
     coeficiente_correlacion,
     descripcion
   )
   return query
+
+
+import pandas as pd
+def getDataFrameQuery(query):
+  return pd.read_sql_query(query,con=getConnection())

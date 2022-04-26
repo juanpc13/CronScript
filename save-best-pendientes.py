@@ -13,7 +13,7 @@ fecha_fin = com.getFechaFin().strftime('%Y-%m-%d %H:%M:%S')
 query = pos.getQueryRutinas()
 rutinas = pos.queryFetchAll(query)
 
-for rutina in range(rutinas):
+for rutina in rutinas:
     ########GENERALIDADES DE LA RUTINA A GENERAR########
     # Id Rutina
     id_rutina = rutina[0]
@@ -26,23 +26,23 @@ for rutina in range(rutinas):
 
     # Se genera la QUERY para obtener la maindata a procesar
     query = pos.getQueryMainData(id_investigacion, id_dispositivo, fecha_inicio, fecha_fin)
-    maindata = pos.queryFetchAll(query)
+    maindata = pos.getDataFrameQuery(query)
 
     # EJE X data que corresponde a la columna
     index = rutina[4]
-    ejeX = maindata(index)
+    ejeX = maindata.iloc[:, index]
     # EJE Y data que corresponde a la columna
     index = rutina[5]
-    ejeY = maindata(index)
+    ejeY = maindata.iloc[:, index]
 
     # FALTA IMPLEMENTAR LOS MULTIPLICADORES
-    
+
     # Se calcula todo lo necesario para la regresion
     pendiente, intercepto, coeficiente_correlacion, p, stderr = mat.regresionLineal(ejeX, ejeY)
-    descripcion = f'Regresion Lineal: Y = {intercepto:.3f} + {pendiente:.3f}X, R={r:.3f}'
+    descripcion = f'Regresion Lineal: Y = {intercepto:.3f} + {pendiente:.3f}X, R={coeficiente_correlacion:.3f}'
 
     # Creacion de la Query por cada uno de los graficos
     constante = intercepto
-    query = getQueryHistorico(id_rutina, nombre, fecha_inicio, fecha_fin, pendiente, constante, coeficiente_correlacion, descripcion)
+    query = pos.getQueryHistorico(id_rutina, nombre, fecha_inicio, fecha_fin, pendiente, constante, coeficiente_correlacion, descripcion)
     pos.runQuery(query)
     print(query)
