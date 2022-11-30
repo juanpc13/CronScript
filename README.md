@@ -12,4 +12,4 @@ docker build -t python-cron .
 
 # Run in container
 scriptPath=/home/jcpleitez/CronScript
-docker run --rm -v ${scriptPath}:/usr/src/app python-cron python generate-data.py >> ${scriptPath}/status.log
+docker run --rm -v $(pwd):/usr/src/app python-cron python save-best-pendientes.py >> $(pwd)/status.log
