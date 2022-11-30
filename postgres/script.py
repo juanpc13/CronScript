@@ -82,9 +82,8 @@ def getQueryRutinas():
   return "SELECT id_rutina, id_investigacion, id_dispositivo, nombre, index_x, index_y, multiplicador_x, multiplicador_y FROM rutina WHERE activa = TRUE;"
 
 def getQueryMainData(idInvestigacion, idDispositivo, fechaInicio, fechaFin):
-  columnas = f"fecha_registrada, humedad AS h2o, dioxido_carbono AS co2, hidrogeno AS h2, acido_sulfhidrico AS h2s, dioxido_azufre AS so2"
   where = f"id_investigacion = {idInvestigacion} AND id_dispositivo = {idDispositivo} AND fecha_registrada >= '{fechaInicio}' AND fecha_registrada < '{fechaFin}'"
-  query = f"SELECT {columnas} FROM maindata WHERE {where} ORDER BY fecha_registrada ASC"
+  query = f"SELECT * FROM maindata WHERE {where} ORDER BY fecha_registrada ASC"
   return query
 
 def getQueryHistorico(id_rutina, nombre, fecha_inicio, fecha_fin, pendiente, constante, coeficiente_correlacion, descripcion):

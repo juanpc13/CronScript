@@ -6,8 +6,10 @@ import mathematics.script as mat
 pos.iniConfigs("environment.ini")#pos.test()
 
 # Generalidades Globales
-fecha_inicio = com.getFechaInicio().strftime('%Y-%m-%d %H:%M:%S')
-fecha_fin = com.getFechaFin().strftime('%Y-%m-%d %H:%M:%S')
+fecha_inicio = '2022-11-01 00:00:00'
+#fecha_inicio = com.getFechaInicio().strftime('%Y-%m-%d %H:%M:%S')
+fecha_fin = '2022-11-01 00:10:00'
+#fecha_fin = com.getFechaFin().strftime('%Y-%m-%d %H:%M:%S')
 
 # Rutuna contiene todas las DATA A GENERAR, POR CADA UNO OBTEBER SU MEJOR PENDIENTE Y GUARDARLA EN LA BD
 query = pos.getQueryRutinas()
@@ -35,11 +37,22 @@ for rutina in rutinas:
     index = rutina[5]
     ejeY = maindata.iloc[:, index]
 
-    # FALTA IMPLEMENTAR LOS MULTIPLICADORES
+    # MULTIPLICADORES DEL EJE X
+    multi = rutina[6]
+    ejeX = ejeX * multi
+    # MULTIPLICADORES DEL EJE Y
+    multi = rutina[7]
+    ejeY = ejeY * multi
 
     # Se calcula todo lo necesario para la regresion
     pendiente, intercepto, coeficiente_correlacion, p, stderr = mat.regresionLineal(ejeX, ejeY)
     descripcion = f'Regresion Lineal: Y = {intercepto:.3f} + {pendiente:.3f}X, R={coeficiente_correlacion:.3f}'
+
+    # Crear Imagen con Plot
+    tittle = nombre
+    xLabel = tittle.split('/')[0]
+    yLabel = tittle.split('/')[1]
+    mat.genGraf(tittle, xLabel, yLabel, ejeX, ejeY, intercepto, pendiente)
 
     # Creacion de la Query por cada uno de los graficos
     constante = intercepto
