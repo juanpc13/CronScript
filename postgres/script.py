@@ -100,6 +100,10 @@ def getQueryHistorico(id_rutina, nombre, fecha_inicio, fecha_fin, pendiente, con
   )
   return query
 
+def queryMainData(idInvestigacion, id_dispositivo, fecha1, fecha2):
+  query = "SELECT * FROM maindata WHERE id_investigacion = "+idInvestigacion+" AND id_dispositivo = "+id_dispositivo+" AND fecha_registrada >= '"+fecha1+"' AND fecha_registrada < '"+fecha2+"' ORDER BY fecha_registrada ASC"
+  return query
+
 
 import pandas as pd
 def getDataFrameQuery(query):

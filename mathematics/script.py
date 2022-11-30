@@ -6,11 +6,19 @@ def regresionLineal(x, y):
   #retornar el valor de la CoeficienteRelacion
   return pendiente, intercepto, r, p, stderr
 
+def getCoeficienteRelacion(x, y):
+  # obteniendo resultados para graficar
+  pendiente, intercepto, r, p, stderr = scipy.stats.linregress(x, y)
+  #retornar el valor de la CoeficienteRelacion
+  return r
 
 import matplotlib.pyplot as plt
 
-def genGraf(titulo, xLabel, yLabel, xArray, yArray, intercepto, pendiente):
+def genGraf(filename, titulo, xLabel, yLabel, xArray, yArray):
   fig, ax = plt.subplots(figsize=(16, 10))
+
+  # obteniendo resultados para graficar
+  pendiente, intercepto, r, p, stderr = scipy.stats.linregress(xArray, yArray)
 
   line = f'Regresion Lineal: Y = {intercepto:.3f} + {pendiente:.3f}X, R={r:.3f}'
 
@@ -32,5 +40,5 @@ def genGraf(titulo, xLabel, yLabel, xArray, yArray, intercepto, pendiente):
   
   # Show or Save
   #plt.show()
-  plt.savefig('foo.png')
+  plt.savefig(filename)
 #genGraf('', '', '', x, y, 1, 2)

@@ -18,3 +18,4 @@ docker run --rm -v $(pwd):/usr/src/app python-cron python save-best-pendientes.p
 pip install psycopg2-binary
 pip install pandas
 pip install scipy
+pip install matplotlib
