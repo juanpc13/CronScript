@@ -13,3 +13,8 @@ docker build -t python-cron .
 # Run in container
 scriptPath=/home/jcpleitez/CronScript
 docker run --rm -v $(pwd):/usr/src/app python-cron python save-best-pendientes.py >> $(pwd)/status.log
+
+# Liberias
+pip install psycopg2-binary
+pip install pandas
+pip install scipy
