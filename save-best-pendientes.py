@@ -5,7 +5,8 @@ import postgres.script as pos
 import mathematics.script as mat
 
 # Initial Configuration for Postgres
-pos.iniConfigs("environment.ini")  # pos.test()
+path = "/home/jcpleitez/ues/DataLogger-BestPendientes/"
+pos.iniConfigs(path + "environment.ini")  # pos.test()
 
 # Rutuna contiene todas las DATA A GENERAR, POR CADA UNO OBTEBER SU MEJOR PENDIENTE Y GUARDARLA EN LA BD
 query = pos.getQueryRutinas()
@@ -67,7 +68,7 @@ for rutina in rutinas:
         currentTime = nextDate
 
     # Graficar Coeficiente de Relacion y Guardar
-    fileName = "www/resultados/" + label_x + "-" + label_y + "-" + fecha1.strftime('%d-%m-%Y_%H') + ".png"
+    fileName = path + "www/resultados/" + label_x + "-" + label_y + "-" + fecha1.strftime('%d-%m-%Y_%H') + ".png"
     if bestCorrelation["correlacion"] != None:
         tittle = "("+str(bestCorrelation["since"]) + "|" + str(bestCorrelation["to"])+")"
         mat.genGraf(fileName, tittle, label_x, label_y, bestCorrelation["xArray"], bestCorrelation["yArray"])
