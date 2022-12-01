@@ -2,7 +2,7 @@
 from datetime import timedelta, datetime
 dt = datetime.now()
 fechaInicio = dt.replace(minute=0, second=0, microsecond=0)
-fechaFin = fechaInicio + timedelta(minutes=10)
+fechaFin = fechaInicio + timedelta(minutes=59, seconds=59)
 
 def getFechaInicio():
     return fechaInicio

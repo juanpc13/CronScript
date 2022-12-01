@@ -79,7 +79,7 @@ def endQueue():
 
 ###########
 def getQueryRutinas():
-  return "SELECT id_rutina, id_investigacion, id_dispositivo, nombre, index_x, index_y, multiplicador_x, multiplicador_y FROM rutina WHERE activa = TRUE;"
+  return "SELECT * FROM rutina WHERE activa = TRUE;"
 
 def getQueryMainData(idInvestigacion, idDispositivo, fechaInicio, fechaFin):
   where = f"id_investigacion = {idInvestigacion} AND id_dispositivo = {idDispositivo} AND fecha_registrada >= '{fechaInicio}' AND fecha_registrada < '{fechaFin}'"
@@ -108,3 +108,17 @@ def queryMainData(idInvestigacion, id_dispositivo, fecha1, fecha2):
 import pandas as pd
 def getDataFrameQuery(query):
   return pd.read_sql_query(query,con=getConnection())
+
+def buildData(idInvestigacion, id_dispositivo, index_date, index_x, index_y, datetime1, datetime2):
+  # Generar query iterada
+  mainQuery = queryMainData(idInvestigacion, id_dispositivo, datetime1, datetime2)
+  
+  # Obtener el DataFrame iterado
+  #mainDataFrame = pd.read_sql_query(mainQuery,con=conn)
+  mainDataFrame = pd.read_sql_query(mainQuery,con=getConnection())
+  
+  # Separar Ejes Fecha, X y Y
+  ejeFecha = mainDataFrame.iloc[:, index_date]
+  ejeX = mainDataFrame.iloc[:, index_x]
+  ejeY = mainDataFrame.iloc[:, index_y]
+  return ejeFecha, ejeX, ejeY

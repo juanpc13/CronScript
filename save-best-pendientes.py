@@ -7,74 +7,68 @@ import mathematics.script as mat
 # Initial Configuration for Postgres
 pos.iniConfigs("environment.ini")  # pos.test()
 
-# ID de la investigacion 3 es la multigas
-idInvestigacion = "1000"  # @param {type:"string"}
-id_dispositivo = "1000"  # @param {type:"string"}
-# fecha1 = "2022-11-01 00:00:00"    #@param {type:"string"}
-# fecha2 = "2022-11-01 01:00:00"    #@param {type:"string"}
-intervalo = 60  # @param {type:"number"}
+# Rutuna contiene todas las DATA A GENERAR, POR CADA UNO OBTEBER SU MEJOR PENDIENTE Y GUARDARLA EN LA BD
+query = pos.getQueryRutinas()
+rutinas = pos.queryFetchAll(query)
+for rutina in rutinas:
+    
+    # ID de la investigacion 3 es la multigas
+    idInvestigacion = str(rutina[1])
+    id_dispositivo = str(rutina[2])
+    index_x = rutina[6]
+    index_y = rutina[7]
+    label_x = rutina[10]
+    label_y = rutina[11]
+    # AUN NO IMPLEMENTADAS EN DB
+    index_date = 3
+    secondSteps = 60
 
+    # Fechas a DateTime
+    formatoFecha = '%Y-%m-%d %H:%M:%S'
+    #fecha1 = com.getFechaInicio()
+    #fecha2 = com.getFechaFin()
+    fecha1 = "2022-11-01 00:00:00"    #@param {type:"string"}
+    fecha2 = "2022-11-01 00:59:59"    #@param {type:"string"}
+    fecha1 = datetime.strptime(fecha1, formatoFecha)
+    fecha2 = datetime.strptime(fecha2, formatoFecha)
 
-formatoFecha = '%Y-%m-%d %H:%M:%S'
-# Generalidades Globales
-startDay = datetime.strptime('2022-11-01 00:00:00', formatoFecha)
-endDay = datetime.strptime('2022-11-01 23:59:59', formatoFecha)
-iteDay = startDay
-
-# Loop dias
-while iteDay <= endDay:
-    # Loop horas
-    starHour = iteDay
-    endHour = starHour + timedelta(hours=23)
-    iteHour = starHour
     # MAIN INVEST
-    mainData = {"correlacion": None, "xArray": None,
-                "yArray": None, "timeA": None, "timeB": None}
-    while iteHour < endHour:
-        # APP
-        #print(iteHour, iteHour + timedelta(hours=1))
+    bestCorrelation = {"correlacion":None, "xArray":None, "yArray":None, "since":None, "to":None}
 
-        # Generar query iterada
-        mainQuery = pos.queryMainData(idInvestigacion, id_dispositivo, iteHour.strftime(
-            formatoFecha), (iteHour + timedelta(seconds=intervalo)).strftime(formatoFecha))
+    # Iterar cada intervalo
+    currentTime = fecha1
+    while currentTime < fecha2:
+        #Next Date
+        nextDate = currentTime + timedelta(seconds=secondSteps)
 
-        # Obtener el DataFrame iterado
-        mainDataFrame = pd.read_sql_query(mainQuery, con=pos.getConnection())
+        # Se obtiene Data
+        ejeFecha, ejeX, ejeY = pos.buildData(idInvestigacion, id_dispositivo, index_date, index_x, index_y, currentTime.strftime(formatoFecha), nextDate.strftime(formatoFecha))
 
-        # Validar DataFrame
-        if len(mainDataFrame) == 0:
-            iteHour = iteHour + timedelta(hours=1)
-            continue
-
-        # Separar Ejes Fecha, X y Y
-        ejeFecha = mainDataFrame.iloc[:, 3]
-        ejeX = mainDataFrame.iloc[:, 12]
-        ejeY = mainDataFrame.iloc[:, 14]
-
-        # Obetener la mejor correlacion
-        # Guardar en mainData si esta None
-        if mainData["correlacion"] == None:
-            mainData["correlacion"] = mat.getCoeficienteRelacion(ejeX, ejeY)
-            mainData["xArray"] = ejeX
-            mainData["yArray"] = ejeY
-            mainData["timeA"] = ejeFecha.iloc[0]
-            mainData["timeB"] = ejeFecha.iloc[-1]
-        else:
-            tempCorrelacion = mat.getCoeficienteRelacion(ejeX, ejeY)
-            if tempCorrelacion > mainData["correlacion"]:
-                mainData["correlacion"] = tempCorrelacion
-                mainData["xArray"] = ejeX
-                mainData["yArray"] = ejeY
-                mainData["timeA"] = ejeFecha.iloc[0]
-                mainData["timeB"] = ejeFecha.iloc[-1]
-
-        # Generate and Save Image
-        filename = iteHour.strftime('%Y-%m-%d-%H') + ".png"
-        titulo = "H2O/CO2" + "("+str(mainData["timeA"]) + "|" + str(mainData["timeB"])+")"
-        mat.genGraf(filename, titulo, "H2O", "CO2", mainData["xArray"], mainData["yArray"])
-
-        # Avanazar en minutos
-        iteHour = iteHour + timedelta(hours=1)
+        # Se valida y se continua
+        if len(ejeFecha) > 0:
+            # Guardar en mainData si esta None
+            if bestCorrelation["correlacion"] == None:
+                bestCorrelation["correlacion"] = mat.getCoeficienteRelacion(ejeX, ejeY)
+                bestCorrelation["xArray"] = ejeX
+                bestCorrelation["yArray"] = ejeY
+                bestCorrelation["since"] = ejeFecha.iloc[0]
+                bestCorrelation["timeB"] = ejeFecha.iloc[-1]
+            else:
+                tempCorrelacion = mat.getCoeficienteRelacion(ejeX, ejeY)
+                if tempCorrelacion > bestCorrelation["correlacion"]:
+                    bestCorrelation["correlacion"] = tempCorrelacion
+                    bestCorrelation["xArray"] = ejeX
+                    bestCorrelation["yArray"] = ejeY
+                    bestCorrelation["since"] = ejeFecha.iloc[0]
+                    bestCorrelation["to"] = ejeFecha.iloc[-1]
         
-    # Avanzar en dias
-    iteDay = iteDay + timedelta(days=1)
+        # Aumentar fecha con secondSteps
+        currentTime = nextDate
+
+    # Graficar Coeficiente de Relacion
+    if bestCorrelation["correlacion"] != None:
+        tittle = "("+str(bestCorrelation["since"]) + "|" + str(bestCorrelation["to"])+")"
+        fileName = "resultados/" + label_x + "_" + label_y + "-" + fecha1.strftime("%H") + ".png"
+        mat.genGraf(fileName, tittle, label_x, label_y, bestCorrelation["xArray"], bestCorrelation["yArray"])
+    else:
+        print("NO DATA FOUND = ", fileName, tittle)
