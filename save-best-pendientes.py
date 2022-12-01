@@ -25,12 +25,13 @@ for rutina in rutinas:
 
     # Fechas a DateTime
     formatoFecha = '%Y-%m-%d %H:%M:%S'
-    #fecha1 = com.getFechaInicio()
-    #fecha2 = com.getFechaFin()
-    fecha1 = "2022-11-01 00:00:00"    #@param {type:"string"}
-    fecha2 = "2022-11-01 00:59:59"    #@param {type:"string"}
-    fecha1 = datetime.strptime(fecha1, formatoFecha)
-    fecha2 = datetime.strptime(fecha2, formatoFecha)
+    fecha1 = com.getFechaInicio()
+    fecha2 = com.getFechaFin()
+    #TEST
+    #fecha1 = "2022-11-01 00:00:00"    #@param {type:"string"}
+    #fecha2 = "2022-11-01 00:59:59"    #@param {type:"string"}
+    #fecha1 = datetime.strptime(fecha1, formatoFecha)
+    #fecha2 = datetime.strptime(fecha2, formatoFecha)
 
     # MAIN INVEST
     bestCorrelation = {"correlacion":None, "xArray":None, "yArray":None, "since":None, "to":None}
@@ -65,10 +66,13 @@ for rutina in rutinas:
         # Aumentar fecha con secondSteps
         currentTime = nextDate
 
-    # Graficar Coeficiente de Relacion
+    # Graficar Coeficiente de Relacion y Guardar
+    fileName = "www/resultados/" + label_x + "-" + label_y + "-" + fecha1.strftime('%d-%m-%Y_%H') + ".png"
     if bestCorrelation["correlacion"] != None:
         tittle = "("+str(bestCorrelation["since"]) + "|" + str(bestCorrelation["to"])+")"
-        fileName = "resultados/" + label_x + "-" + label_y + "-" + fecha1.strftime('%d-%m-%Y_%H') + ".png"
         mat.genGraf(fileName, tittle, label_x, label_y, bestCorrelation["xArray"], bestCorrelation["yArray"])
+        # LOGS
+        print("OK = ", fileName)
     else:
-        print("NO DATA FOUND = ", fileName, tittle)
+        # LOGS
+        print("FAIL = ", fileName)
