@@ -68,7 +68,7 @@ for rutina in rutinas:
     # Graficar Coeficiente de Relacion
     if bestCorrelation["correlacion"] != None:
         tittle = "("+str(bestCorrelation["since"]) + "|" + str(bestCorrelation["to"])+")"
-        fileName = "resultados/" + label_x + "_" + label_y + "-" + fecha1.strftime("%H") + ".png"
+        fileName = "resultados/" + label_x + "-" + label_y + "-" + fecha1.strftime('%d-%m-%Y_%H') + ".png"
         mat.genGraf(fileName, tittle, label_x, label_y, bestCorrelation["xArray"], bestCorrelation["yArray"])
     else:
         print("NO DATA FOUND = ", fileName, tittle)

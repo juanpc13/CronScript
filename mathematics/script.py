@@ -15,7 +15,7 @@ def getCoeficienteRelacion(x, y):
 import matplotlib.pyplot as plt
 
 def genGraf(filename, titulo, xLabel, yLabel, xArray, yArray):
-  fig, ax = plt.subplots(figsize=(16, 10))
+  fig, ax = plt.subplots(figsize=(16, 14))
 
   # obteniendo resultados para graficar
   pendiente, intercepto, r, p, stderr = scipy.stats.linregress(xArray, yArray)
@@ -36,7 +36,7 @@ def genGraf(filename, titulo, xLabel, yLabel, xArray, yArray):
 
   # Plot legend
   #plt.legend(loc='best', fontsize=24)
-  ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.10), fancybox=True, shadow=True, ncol=5, fontsize=24)
+  ax.legend(loc='center', bbox_to_anchor=(0.5, -0.10), fancybox=True, shadow=True, ncol=5, fontsize=24)
   
   # Show or Save
   #plt.show()
