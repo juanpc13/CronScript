@@ -41,4 +41,7 @@ def genGraf(filename, titulo, xLabel, yLabel, xArray, yArray):
   # Show or Save
   #plt.show()
   plt.savefig(filename)
+
+  lineDescription = line
+  return pendiente, intercepto, r, lineDescription
 #genGraf('', '', '', x, y, 1, 2)

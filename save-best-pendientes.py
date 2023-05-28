@@ -14,6 +14,7 @@ rutinas = pos.queryFetchAll(query)
 for rutina in rutinas:
     
     # ID de la investigacion 3 es la multigas
+    idRutina = rutina[0]
     idInvestigacion = str(rutina[1])
     id_dispositivo = str(rutina[2])
     index_x = rutina[6]
@@ -28,11 +29,6 @@ for rutina in rutinas:
     formatoFecha = '%Y-%m-%d %H:%M:%S'
     fecha1 = com.getFechaInicio()
     fecha2 = com.getFechaFin()
-    #TEST
-    #fecha1 = "2022-11-01 00:00:00"    #@param {type:"string"}
-    #fecha2 = "2022-11-01 00:59:59"    #@param {type:"string"}
-    #fecha1 = datetime.strptime(fecha1, formatoFecha)
-    #fecha2 = datetime.strptime(fecha2, formatoFecha)
 
     # MAIN INVEST
     bestCorrelation = {"correlacion":None, "xArray":None, "yArray":None, "since":None, "to":None}
@@ -70,8 +66,14 @@ for rutina in rutinas:
     # Graficar Coeficiente de Relacion y Guardar
     fileName = path + "www/resultados/" + label_x + "-" + label_y + "-" + fecha1.strftime('%d-%m-%Y_%H') + ".png"
     if bestCorrelation["correlacion"] != None:
-        tittle = "("+str(bestCorrelation["since"]) + "|" + str(bestCorrelation["to"])+")"
-        mat.genGraf(fileName, tittle, label_x, label_y, bestCorrelation["xArray"], bestCorrelation["yArray"])
+        sinceTxt = bestCorrelation["since"]
+        toTxt = bestCorrelation["to"]
+        tittle = f"Rutina({idRutina}) - Fechas({sinceTxt}|{toTxt})"
+        pendiente, intercepto, r, lineDescription = mat.genGraf(fileName, tittle, label_x, label_y, bestCorrelation["xArray"], bestCorrelation["yArray"])
+        # Save Pendiente to DB en HISTORICO
+        nombreHistorico = label_x + "/" + label_y
+        queryDeHistorico = f"INSERT INTO historico(id_rutina, nombre, fecha_inicio, fecha_fin, pendiente, constante, coeficiente_correlacion, descripcion) VALUES ({idRutina}, '{nombreHistorico}', '{fecha1.strftime(formatoFecha)}', '{fecha2.strftime(formatoFecha)}', {pendiente}, {intercepto}, {r}, '{lineDescription}')"
+        pos.runQuery(queryDeHistorico)
         # LOGS
         print("OK = ", fileName)
     else:
